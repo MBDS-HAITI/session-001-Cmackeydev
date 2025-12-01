@@ -1,8 +1,62 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { useState, useEffect } from "react";
 
+function Horloge() {
+  const [now, setNow] = useState(new Date());
+
+  // Met à jour l'heure chaque seconde
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+
+    // Nettoyage quand le composant est démonté
+    return () => clearInterval(timer);
+  }, []);
+
+  const joursSemaine = [
+    "dimanche",
+    "lundi",
+    "mardi",
+    "mercredi",
+    "jeudi",
+    "vendredi",
+    "samedi",
+  ];
+
+  const moisNoms = [
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
+  ];
+
+  const jourSemaine = joursSemaine[now.getDay()];
+  const jour = now.getDate();
+  const mois = moisNoms[now.getMonth()];
+  const annee = now.getFullYear();
+
+  const heure = String(now.getHours()).padStart(2, "0");
+  const minute = String(now.getMinutes()).padStart(2, "0");
+  const seconde = String(now.getSeconds()).padStart(2, "0");
+
+  return (
+    <p>
+      Bonjour, on est le {jourSemaine} {jour} {mois} {annee} et il est{" "}
+      {heure}:{minute}:{seconde}
+    </p>
+  );
+}
 function Test() {
   return <p>Test du composant</p>
 }
@@ -20,7 +74,7 @@ function Header()
 
 function MainContent(){
   return (
-    <p>Ici, nous afficherons des informations interessantes :) </p>
+    <p> <Horloge/> </p>
   )
 }
 
