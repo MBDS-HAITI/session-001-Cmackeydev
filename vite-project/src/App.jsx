@@ -17,6 +17,12 @@ function Header()
     </div>
   )
 }
+
+function MainContent(){
+  return (
+    <p>Ici, nous afficherons des informations interessantes :) </p>
+  )
+}
 // Composant avec un state local
 function Backup() {
   const [count, setCount] = useState(0)   // ✅ state défini ici
@@ -57,6 +63,7 @@ function App() {
   return (
     <>
       <Header/>
+      <MainContent/>
       
     </>
   )
