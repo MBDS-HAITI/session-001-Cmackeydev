@@ -23,6 +23,11 @@ function MainContent(){
     <p>Ici, nous afficherons des informations interessantes :) </p>
   )
 }
+
+function Footer()
+{
+  return <p>Tous droits réservés - CHARLES Mackey </p>
+}
 // Composant avec un state local
 function Backup() {
   const [count, setCount] = useState(0)   // ✅ state défini ici
@@ -64,6 +69,7 @@ function App() {
     <>
       <Header/>
       <MainContent/>
+      <Footer/>
       
     </>
   )
