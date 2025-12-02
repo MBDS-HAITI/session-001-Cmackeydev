@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import students from "../../../data.json"
 
 export function FooterCredit() {
   const annee = new Date().getFullYear();
@@ -10,6 +11,38 @@ export function FooterCredit() {
   );
 }
 
+export function RandomStudent()
+{
+ var index= Math.floor(Math.random() * students.length)
+  return (<Student id={index}/> );
+}
+export function Student({id})
+{
+  return ( <table border="1">
+      <thead>
+        <tr>
+          <th>Unique ID</th>
+          <th>Cours</th>
+          <th>Prénom</th>
+          <th>Nom</th>
+          <th>ID étudiant</th>
+          <th>Date</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{students[id].unique_id}</td>
+          <td>{students[id].course}</td>
+          <td>{students[id].student.firstname}</td>
+          <td>{students[id].student.lastname}</td>
+          <td>{students[id].student.id}</td>
+          <td>{students[id].date}</td>
+          <td>{students[id].grade}</td>
+        </tr>
+      </tbody>
+    </table>);
+}
 
 export function Header()
 {

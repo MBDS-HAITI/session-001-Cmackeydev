@@ -1,5 +1,5 @@
 import './App.css'
-import {Header,MainContent,Footer} from './Session01Components/Components'
+import {Header,MainContent,Footer, RandomStudent} from './Session01Components/Components'
 
 function App() {
   return (
@@ -7,6 +7,7 @@ function App() {
       <Header/>
       <MainContent/>
       <Footer/>
+      <RandomStudent />
       
     </>
   )
