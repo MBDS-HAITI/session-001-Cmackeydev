@@ -3,6 +3,17 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { useState, useEffect } from "react";
 
+function FooterCredit() {
+  const annee = new Date().getFullYear();
+
+  return (
+    <p>
+      Tous droits réservés - {annee} CHARLES Mackey
+    </p>
+  );
+}
+
+
 function Horloge() {
   const [now, setNow] = useState(new Date());
 
@@ -80,7 +91,7 @@ function MainContent(){
 
 function Footer()
 {
-  return <p>Tous droits réservés - CHARLES Mackey </p>
+  return <FooterCredit/>
 }
 // Composant avec un state local
 function Backup() {
