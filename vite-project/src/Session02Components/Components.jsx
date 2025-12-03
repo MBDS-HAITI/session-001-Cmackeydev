@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import students from "../../../data.json"
+import students from "/data/data.json"
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 
 const MENU_ITEMS = [
   { id: "notes", label: "Notes" },
@@ -41,33 +49,44 @@ export function RandomStudent()
  var index= Math.floor(Math.random() * students.length)
   return (<Student id={index}/> );
 }
-export function Student({id})
-{
-  return ( <table border="1">
-      <thead>
-        <tr>
-          <th>Unique ID</th>
-          <th>Cours</th>
-          <th>Prénom</th>
-          <th>Nom</th>
-          <th>ID étudiant</th>
-          <th>Date</th>
-          <th>Note</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{students[id].unique_id}</td>
-          <td>{students[id].course}</td>
-          <td>{students[id].student.firstname}</td>
-          <td>{students[id].student.lastname}</td>
-          <td>{students[id].student.id}</td>
-          <td>{students[id].date}</td>
-          <td>{students[id].grade}</td>
-        </tr>
-      </tbody>
-    </table>);
+export function Student({ id }) {
+  const row = students[id];
+
+  if (!row) {
+    return <p>Aucun étudiant pour l’index {id}</p>;
+  }
+
+  return (
+    <TableContainer component={Paper}>
+      <Table aria-label="détails d’un étudiant">
+        <TableHead>
+          <TableRow>
+            <TableCell>Unique ID</TableCell>
+            <TableCell>Cours</TableCell>
+            <TableCell>Prénom</TableCell>
+            <TableCell>Nom</TableCell>
+            <TableCell>ID étudiant</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell align="right">Note</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          <TableRow>
+            <TableCell>{row.unique_id}</TableCell>
+            <TableCell>{row.course}</TableCell>
+            <TableCell>{row.student.firstname}</TableCell>
+            <TableCell>{row.student.lastname}</TableCell>
+            <TableCell>{row.student.id}</TableCell>
+            <TableCell>{row.date}</TableCell>
+            <TableCell align="right">{row.grade}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 }
+
 
 export function Header()
 {
