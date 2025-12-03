@@ -301,7 +301,7 @@ export function Horloge() {
 
 export function Content({ activeItem }) {
   if (activeItem === "notes") {
-    return <p>Contenu de la page : Notes</p>;
+    return <GradeTable/>;
   }
 
   if (activeItem === "etudiants") {
