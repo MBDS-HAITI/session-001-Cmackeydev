@@ -127,6 +127,97 @@ export function Student({ student }) {
   );
 }
 
+
+export function Course({ course }) {
+  return (
+    <TableRow>
+      <TableCell>{course.code}</TableCell>
+      <TableCell>{course.label}</TableCell>
+    </TableRow>
+  );
+}
+
+export function CourseTable() {
+  if (!Array.isArray(courses) || courses.length === 0) {
+    return <p>Aucune matière à afficher</p>;
+  }
+
+  return (
+    <TableContainer component={Paper}>
+      <Table aria-label="tableau des matières">
+        <TableHead>
+          <TableRow>
+            <TableCell>Code matière</TableCell>
+            <TableCell>Intitulé</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {courses.map((c) => (
+            <Course key={c.code} course={c} />
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
+export function Grade({ grade, student, course }) {
+  return (
+    <TableRow>
+      <TableCell>{grade.id}</TableCell>
+      <TableCell>{student ? `${student.firstname} ${student.lastname}` : "-"}</TableCell>
+      <TableCell>{student ? student.id : "-"}</TableCell>
+      <TableCell>{course ? course.label : grade.courseCode}</TableCell>
+      <TableCell>{grade.date}</TableCell>
+      <TableCell align="right">{grade.grade}</TableCell>
+    </TableRow>
+  );
+}
+
+export function GradeTable() {
+  if (!Array.isArray(grades) || grades.length === 0) {
+    return <p>Aucune note à afficher</p>;
+  }
+
+  // Index pour retrouver rapidement étudiant et matière
+  const studentById = new Map(students.map((s) => [s.id, s]));
+  const courseByCode = new Map(courses.map((c) => [c.code, c]));
+
+  return (
+    <TableContainer component={Paper}>
+      <Table aria-label="tableau des notes">
+        <TableHead>
+          <TableRow>
+            <TableCell>Unique ID</TableCell>
+            <TableCell>Étudiant</TableCell>
+            <TableCell>ID Étudiant</TableCell>
+            <TableCell>Matière</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell align="right">Note</TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {grades.map((g) => {
+            const student = studentById.get(g.studentId);
+            const course = courseByCode.get(g.courseCode);
+
+            return (
+              <Grade
+                key={g.id}
+                grade={g}
+                student={student}
+                course={course}
+              />
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
 export function Header()
 {
   return (
@@ -218,7 +309,7 @@ export function Content({ activeItem }) {
   }
 
   if (activeItem === "matieres") {
-    return <p>Contenu de la page : Matieres</p>;
+    return <CourseTable/>;
   }
 
   if (activeItem === "apropos") {
