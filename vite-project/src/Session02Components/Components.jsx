@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import students from "/data/data.json"
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -7,6 +6,49 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+
+import rawData from "../data/data.json";
+
+// 1) Tableau des notes (grades)
+// -> 1 entrée = 1 note pour 1 étudiant dans 1 matière
+export const grades = rawData.map((row) => ({
+  id: row.unique_id,
+  studentId: row.student.id,
+  courseCode: row.course,   // on utilise le nom du cours comme identifiant
+  date: row.date,
+  grade: row.grade,
+}));
+
+// 2) Tableau des étudiants (uniques)
+const studentsMap = new Map();
+
+rawData.forEach((row) => {
+  const s = row.student;
+  if (!studentsMap.has(s.id)) {
+    studentsMap.set(s.id, {
+      id: s.id,
+      firstname: s.firstname,
+      lastname: s.lastname,
+    });
+  }
+});
+
+export const students = Array.from(studentsMap.values());
+
+// 3) Tableau des matières (uniques)
+const coursesMap = new Map();
+
+rawData.forEach((row) => {
+  const code = row.course; // ex: "Math 101"
+  if (!coursesMap.has(code)) {
+    coursesMap.set(code, {
+      code,       // identifiant de la matière
+      label: code // pour l'affichage (tu pourras changer plus tard)
+    });
+  }
+});
+
+export const courses = Array.from(coursesMap.values());
 
 
 const MENU_ITEMS = [
@@ -49,44 +91,41 @@ export function RandomStudent()
  var index= Math.floor(Math.random() * students.length)
   return (<Student id={index}/> );
 }
-export function Student({ id }) {
-  const row = students[id];
 
-  if (!row) {
-    return <p>Aucun étudiant pour l’index {id}</p>;
+export function StudentTable() {
+  if (!Array.isArray(students) || students.length === 0) {
+    return <p>Aucun étudiant à afficher</p>;
   }
 
   return (
     <TableContainer component={Paper}>
-      <Table aria-label="détails d’un étudiant">
+      <Table aria-label="tableau des étudiants">
         <TableHead>
           <TableRow>
-            <TableCell>Unique ID</TableCell>
-            <TableCell>Cours</TableCell>
+            <TableCell>ID étudiant</TableCell>
             <TableCell>Prénom</TableCell>
             <TableCell>Nom</TableCell>
-            <TableCell>ID étudiant</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell align="right">Note</TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
-          <TableRow>
-            <TableCell>{row.unique_id}</TableCell>
-            <TableCell>{row.course}</TableCell>
-            <TableCell>{row.student.firstname}</TableCell>
-            <TableCell>{row.student.lastname}</TableCell>
-            <TableCell>{row.student.id}</TableCell>
-            <TableCell>{row.date}</TableCell>
-            <TableCell align="right">{row.grade}</TableCell>
-          </TableRow>
+          {students.map((s) => (
+            <Student key={s.id} student={s} />
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
 }
-
+export function Student({ student }) {
+  return (
+    <TableRow>
+      <TableCell>{student.id}</TableCell>
+      <TableCell>{student.firstname}</TableCell>
+      <TableCell>{student.lastname}</TableCell>
+    </TableRow>
+  );
+}
 
 export function Header()
 {
@@ -175,7 +214,7 @@ export function Content({ activeItem }) {
   }
 
   if (activeItem === "etudiants") {
-    return <p>Contenu de la page : Etudiants</p>;
+    return <StudentTable />;
   }
 
   if (activeItem === "matieres") {
