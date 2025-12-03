@@ -1,17 +1,26 @@
 import { useState, useEffect } from "react";
 import students from "../../../data.json"
 
-export function Menu() {
-  function handleClick(item) {
-    console.log("Tu as cliqué sur :", item);
-  }
+const MENU_ITEMS = [
+  { id: "notes", label: "Notes" },
+  { id: "etudiants", label: "Etudiants" },
+  { id: "matieres", label: "Matieres" },
+  { id: "apropos", label: "A propos" },
+];
+
+export function Menu({ activeItem, onChange }) {
   return (
     <nav>
       <ul>
-        <li onClick={()=>handleClick("Notes")}>Notes</li>
-        <li onClick={()=>handleClick("Etudiants")}>Etudiants </li>
-        <li onClick={()=>handleClick("Matieres")}>Matieres</li>
-        <li onClick={()=>handleClick("A propos")}>A propos</li>
+        {MENU_ITEMS.map((item) => (
+          <li
+            key={item.id}
+            onClick={() => onChange(item.id)}
+            className={activeItem === item.id ? "active" : ""}
+          >
+            {item.label}
+          </li>
+        ))}
       </ul>
     </nav>
   );
@@ -65,17 +74,21 @@ export function Header()
   return (
     <div>
       <img src="/mbds_logo_transparent.svg" className="logo" alt="Vite logo" />
-      <h1>Introduction à React </h1>
-      <h2> A la découverte des premières notions de React </h2>
     </div>
   )
 }
 
-export function MainContent(){
+export function MainContent() {
+  const [activeItem, setActiveItem] = useState("notes");
+
   return (
-    <p> <Horloge/> </p>
-  )
+    <main>
+      <Menu activeItem={activeItem} onChange={setActiveItem} />
+      <Content activeItem={activeItem} />
+    </main>
+  );
 }
+
 
 export function Footer()
 {
@@ -87,13 +100,11 @@ export function Footer()
 export function Horloge() {
   const [now, setNow] = useState(new Date());
 
-  // Met à jour l'heure chaque seconde
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(new Date());
     }, 1000);
 
-    // Nettoyage quand le composant est démonté
     return () => clearInterval(timer);
   }, []);
 
@@ -139,3 +150,22 @@ export function Horloge() {
   );
 }
 
+export function Content({ activeItem }) {
+  if (activeItem === "notes") {
+    return <p>Contenu de la page : Notes</p>;
+  }
+
+  if (activeItem === "etudiants") {
+    return <p>Contenu de la page : Etudiants</p>;
+  }
+
+  if (activeItem === "matieres") {
+    return <p>Contenu de la page : Matieres</p>;
+  }
+
+  if (activeItem === "apropos") {
+    return <p>Contenu de la page : A propos</p>;
+  }
+
+  return <p>Veuillez choisir une section dans le menu.</p>;
+}
