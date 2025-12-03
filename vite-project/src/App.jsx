@@ -1,13 +1,13 @@
 import './App.css'
-import {Header,MainContent,Footer, RandomStudent} from './Session01Components/Components'
+import {Header,MainContent,Footer, Menu} from './Session01Components/Components'
 
 function App() {
   return (
     <>
       <Header/>
+      <Menu/>
       <MainContent/>
       <Footer/>
-      <RandomStudent />
       
     </>
   )

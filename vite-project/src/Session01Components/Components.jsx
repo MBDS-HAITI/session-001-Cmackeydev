@@ -1,6 +1,22 @@
 import { useState, useEffect } from "react";
 import students from "../../../data.json"
 
+export function Menu() {
+  function handleClick(item) {
+    console.log("Tu as cliqué sur :", item);
+  }
+  return (
+    <nav>
+      <ul>
+        <li onClick={()=>handleClick("Notes")}>Notes</li>
+        <li onClick={()=>handleClick("Etudiants")}>Etudiants </li>
+        <li onClick={()=>handleClick("Matieres")}>Matieres</li>
+        <li onClick={()=>handleClick("A propos")}>A propos</li>
+      </ul>
+    </nav>
+  );
+}
+
 export function FooterCredit() {
   const annee = new Date().getFullYear();
 
@@ -116,10 +132,10 @@ export function Horloge() {
   const seconde = String(now.getSeconds()).padStart(2, "0");
 
   return (
-    <p>
+    <>
       Bonjour, on est le {jourSemaine} {jour} {mois} {annee} et il est{" "}
       {heure}:{minute}:{seconde}
-    </p>
+    </>
   );
 }
 
