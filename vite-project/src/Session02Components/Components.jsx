@@ -313,7 +313,7 @@ export function Content({ activeItem }) {
   }
 
   if (activeItem === "apropos") {
-    return <p>Contenu de la page : A propos</p>;
+    return <p>Ce projet est réalisé par Mackey CHARLES</p>;
   }
 
   return <p>Veuillez choisir une section dans le menu.</p>;
