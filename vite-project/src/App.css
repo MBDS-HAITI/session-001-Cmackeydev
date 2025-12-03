@@ -59,3 +59,37 @@ nav li.active {
 nav li:hover {
   color: #646cff;
 }
+
+.fade {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.table-controls {
+  margin: 0.5rem 0;
+}
+
+.table-controls input {
+  padding: 0.25rem 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

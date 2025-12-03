@@ -10,11 +10,10 @@ import Paper from "@mui/material/Paper";
 import rawData from "../data/data.json";
 
 // 1) Tableau des notes (grades)
-// -> 1 entrée = 1 note pour 1 étudiant dans 1 matière
 export const grades = rawData.map((row) => ({
   id: row.unique_id,
   studentId: row.student.id,
-  courseCode: row.course,   // on utilise le nom du cours comme identifiant
+  courseCode: row.course,
   date: row.date,
   grade: row.grade,
 }));
@@ -86,37 +85,127 @@ export function FooterCredit() {
   );
 }
 
-export function RandomStudent()
-{
- var index= Math.floor(Math.random() * students.length)
-  return (<Student id={index}/> );
+export function RandomStudent() {
+  var index = Math.floor(Math.random() * students.length);
+  return (<Student id={index} />);
 }
 
+/* ===================== */
+/*     STUDENT TABLE     */
+/* ===================== */
+
 export function StudentTable() {
+  const [search, setSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+
   if (!Array.isArray(students) || students.length === 0) {
     return <p>Aucun étudiant à afficher</p>;
   }
 
-  return (
-    <TableContainer component={Paper}>
-      <Table aria-label="tableau des étudiants">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID étudiant</TableCell>
-            <TableCell>Prénom</TableCell>
-            <TableCell>Nom</TableCell>
-          </TableRow>
-        </TableHead>
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+    setPage(0);
+  };
 
-        <TableBody>
-          {students.map((s) => (
-            <Student key={s.id} student={s} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+  const filtered = students.filter((s) => {
+    const q = search.toLowerCase();
+    return (
+      String(s.id).includes(q) ||
+      s.firstname.toLowerCase().includes(q) ||
+      s.lastname.toLowerCase().includes(q)
+    );
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    const aVal = a[sortConfig.key];
+    const bVal = b[sortConfig.key];
+
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+    }
+
+    const aStr = String(aVal).toLowerCase();
+    const bStr = String(bVal).toLowerCase();
+    const cmp = aStr.localeCompare(bStr);
+    return sortConfig.direction === "asc" ? cmp : -cmp;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+  const start = page * rowsPerPage;
+  const paginated = sorted.slice(start, start + rowsPerPage);
+
+  const goPrev = () => setPage((p) => Math.max(0, p - 1));
+  const goNext = () => setPage((p) => Math.min(totalPages - 1, p + 1));
+
+  return (
+    <>
+      <div className="table-controls">
+        <input
+          type="text"
+          placeholder="Rechercher un étudiant..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
+        />
+      </div>
+
+      <TableContainer component={Paper}>
+        <Table aria-label="tableau des étudiants">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                onClick={() => handleSort("id")}
+                style={{ cursor: "pointer" }}
+              >
+                ID étudiant {sortConfig.key === "id" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("firstname")}
+                style={{ cursor: "pointer" }}
+              >
+                Prénom {sortConfig.key === "firstname" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("lastname")}
+                style={{ cursor: "pointer" }}
+              >
+                Nom {sortConfig.key === "lastname" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {paginated.map((s) => (
+              <Student key={s.id} student={s} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <div className="pagination">
+        <button onClick={goPrev} disabled={page === 0}>
+          Précédent
+        </button>
+        <span>
+          Page {page + 1} / {totalPages}
+        </span>
+        <button onClick={goNext} disabled={page >= totalPages - 1}>
+          Suivant
+        </button>
+      </div>
+    </>
   );
 }
+
 export function Student({ student }) {
   return (
     <TableRow>
@@ -127,6 +216,9 @@ export function Student({ student }) {
   );
 }
 
+/* ===================== */
+/*     COURSE TABLE      */
+/* ===================== */
 
 export function Course({ course }) {
   return (
@@ -138,29 +230,109 @@ export function Course({ course }) {
 }
 
 export function CourseTable() {
+  const [search, setSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "code", direction: "asc" });
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+
   if (!Array.isArray(courses) || courses.length === 0) {
     return <p>Aucune matière à afficher</p>;
   }
 
-  return (
-    <TableContainer component={Paper}>
-      <Table aria-label="tableau des matières">
-        <TableHead>
-          <TableRow>
-            <TableCell>Code matière</TableCell>
-            <TableCell>Intitulé</TableCell>
-          </TableRow>
-        </TableHead>
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+    setPage(0);
+  };
 
-        <TableBody>
-          {courses.map((c) => (
-            <Course key={c.code} course={c} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+  const filtered = courses.filter((c) => {
+    const q = search.toLowerCase();
+    return (
+      c.code.toLowerCase().includes(q) ||
+      c.label.toLowerCase().includes(q)
+    );
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    const aVal = a[sortConfig.key];
+    const bVal = b[sortConfig.key];
+
+    const aStr = String(aVal).toLowerCase();
+    const bStr = String(bVal).toLowerCase();
+    const cmp = aStr.localeCompare(bStr);
+    return sortConfig.direction === "asc" ? cmp : -cmp;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+  const start = page * rowsPerPage;
+  const paginated = sorted.slice(start, start + rowsPerPage);
+
+  const goPrev = () => setPage((p) => Math.max(0, p - 1));
+  const goNext = () => setPage((p) => Math.min(totalPages - 1, p + 1));
+
+  return (
+    <>
+      <div className="table-controls">
+        <input
+          type="text"
+          placeholder="Rechercher une matière..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
+        />
+      </div>
+
+      <TableContainer component={Paper}>
+        <Table aria-label="tableau des matières">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                onClick={() => handleSort("code")}
+                style={{ cursor: "pointer" }}
+              >
+                Code matière {sortConfig.key === "code" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("label")}
+                style={{ cursor: "pointer" }}
+              >
+                Intitulé {sortConfig.key === "label" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {paginated.map((c) => (
+              <Course key={c.code} course={c} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <div className="pagination">
+        <button onClick={goPrev} disabled={page === 0}>
+          Précédent
+        </button>
+        <span>
+          Page {page + 1} / {totalPages}
+        </span>
+        <button onClick={goNext} disabled={page >= totalPages - 1}>
+          Suivant
+        </button>
+      </div>
+    </>
   );
 }
+
+/* ===================== */
+/*      GRADE TABLE      */
+/* ===================== */
 
 export function Grade({ grade, student, course }) {
   return (
@@ -176,6 +348,11 @@ export function Grade({ grade, student, course }) {
 }
 
 export function GradeTable() {
+  const [search, setSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+
   if (!Array.isArray(grades) || grades.length === 0) {
     return <p>Aucune note à afficher</p>;
   }
@@ -184,47 +361,172 @@ export function GradeTable() {
   const studentById = new Map(students.map((s) => [s.id, s]));
   const courseByCode = new Map(courses.map((c) => [c.code, c]));
 
+  const enriched = grades.map((g) => {
+    const student = studentById.get(g.studentId);
+    const course = courseByCode.get(g.courseCode);
+    const studentName = student ? `${student.firstname} ${student.lastname}` : "";
+    const courseLabel = course ? course.label : g.courseCode;
+    return { grade: g, student, course, studentName, courseLabel };
+  });
+
+  const filtered = enriched.filter(({ grade, studentName, courseLabel }) => {
+    const q = search.toLowerCase();
+    return (
+      String(grade.id).includes(q) ||
+      String(grade.studentId).includes(q) ||
+      grade.date.toLowerCase().includes(q) ||
+      String(grade.grade).includes(q) ||
+      studentName.toLowerCase().includes(q) ||
+      courseLabel.toLowerCase().includes(q)
+    );
+  });
+
+  const getValue = (item, key) => {
+    switch (key) {
+      case "id":
+        return item.grade.id;
+      case "studentName":
+        return item.studentName;
+      case "studentId":
+        return item.grade.studentId;
+      case "course":
+        return item.courseLabel;
+      case "date":
+        return item.grade.date;
+      case "grade":
+        return item.grade.grade;
+      default:
+        return "";
+    }
+  };
+
+  const sorted = [...filtered].sort((a, b) => {
+    const aVal = getValue(a, sortConfig.key);
+    const bVal = getValue(b, sortConfig.key);
+
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+    }
+
+    const aStr = String(aVal).toLowerCase();
+    const bStr = String(bVal).toLowerCase();
+    const cmp = aStr.localeCompare(bStr);
+    return sortConfig.direction === "asc" ? cmp : -cmp;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
+  const start = page * rowsPerPage;
+  const paginated = sorted.slice(start, start + rowsPerPage);
+
+  const goPrev = () => setPage((p) => Math.max(0, p - 1));
+  const goNext = () => setPage((p) => Math.min(totalPages - 1, p + 1));
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+    setPage(0);
+  };
+
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="tableau des notes">
-        <TableHead>
-          <TableRow>
-            <TableCell>Unique ID</TableCell>
-            <TableCell>Étudiant</TableCell>
-            <TableCell>ID Étudiant</TableCell>
-            <TableCell>Matière</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell align="right">Note</TableCell>
-          </TableRow>
-        </TableHead>
+    <>
+      <div className="table-controls">
+        <input
+          type="text"
+          placeholder="Rechercher une note, un étudiant, une matière..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
+        />
+      </div>
 
-        <TableBody>
-          {grades.map((g) => {
-            const student = studentById.get(g.studentId);
-            const course = courseByCode.get(g.courseCode);
+      <TableContainer component={Paper}>
+        <Table aria-label="tableau des notes">
+          <TableHead>
+            <TableRow>
+              <TableCell
+                onClick={() => handleSort("id")}
+                style={{ cursor: "pointer" }}
+              >
+                Unique ID {sortConfig.key === "id" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("studentName")}
+                style={{ cursor: "pointer" }}
+              >
+                Étudiant {sortConfig.key === "studentName" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("studentId")}
+                style={{ cursor: "pointer" }}
+              >
+                ID Étudiant {sortConfig.key === "studentId" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("course")}
+                style={{ cursor: "pointer" }}
+              >
+                Matière {sortConfig.key === "course" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                onClick={() => handleSort("date")}
+                style={{ cursor: "pointer" }}
+              >
+                Date {sortConfig.key === "date" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+              <TableCell
+                align="right"
+                onClick={() => handleSort("grade")}
+                style={{ cursor: "pointer" }}
+              >
+                Note {sortConfig.key === "grade" ? (sortConfig.direction === "asc" ? "↑" : "↓") : ""}
+              </TableCell>
+            </TableRow>
+          </TableHead>
 
-            return (
+          <TableBody>
+            {paginated.map(({ grade, student, course }) => (
               <Grade
-                key={g.id}
-                grade={g}
+                key={grade.id}
+                grade={grade}
                 student={student}
                 course={course}
               />
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <div className="pagination">
+        <button onClick={goPrev} disabled={page === 0}>
+          Précédent
+        </button>
+        <span>
+          Page {page + 1} / {totalPages}
+        </span>
+        <button onClick={goNext} disabled={page >= totalPages - 1}>
+          Suivant
+        </button>
+      </div>
+    </>
   );
 }
 
-export function Header()
-{
+/* ===================== */
+/*   LAYOUT & CONTENT    */
+/* ===================== */
+
+export function Header() {
   return (
     <div>
       <img src="/mbds_logo_transparent.svg" className="logo" alt="Vite logo" />
     </div>
-  )
+  );
 }
 
 export function MainContent() {
@@ -233,18 +535,17 @@ export function MainContent() {
   return (
     <main>
       <Menu activeItem={activeItem} onChange={setActiveItem} />
-      <Content activeItem={activeItem} />
+      {/* Animation fade-in sur changement de menu */}
+      <div key={activeItem} className="fade">
+        <Content activeItem={activeItem} />
+      </div>
     </main>
   );
 }
 
-
-export function Footer()
-{
-  return <FooterCredit/>
+export function Footer() {
+  return <FooterCredit />;
 }
-
-
 
 export function Horloge() {
   const [now, setNow] = useState(new Date());
@@ -301,7 +602,7 @@ export function Horloge() {
 
 export function Content({ activeItem }) {
   if (activeItem === "notes") {
-    return <GradeTable/>;
+    return <GradeTable />;
   }
 
   if (activeItem === "etudiants") {
@@ -309,12 +610,11 @@ export function Content({ activeItem }) {
   }
 
   if (activeItem === "matieres") {
-    return <CourseTable/>;
+    return <CourseTable />;
   }
 
   if (activeItem === "apropos") {
     return <p>Ce projet est réalisé par Mackey CHARLES</p>;
   }
 
-  return <p>Veuillez choisir une section dans le menu.</p>;
 }
