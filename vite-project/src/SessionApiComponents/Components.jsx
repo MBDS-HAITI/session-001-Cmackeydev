@@ -6,6 +6,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { Link, useLocation, Routes, Route } from "react-router-dom";
+
 
 // =========================
 //    API & CUSTOM HOOKS
@@ -93,25 +95,29 @@ function useGrades() {
 // =========================
 
 const MENU_ITEMS = [
-  { id: "notes", label: "Notes" },
-  { id: "etudiants", label: "Etudiants" },
-  { id: "matieres", label: "Matieres" },
-  { id: "apropos", label: "A propos" },
+  { id: "notes",     label: "Notes",     path: "/notes" },
+  { id: "etudiants", label: "Etudiants", path: "/etudiants" },
+  { id: "matieres",  label: "Matieres",  path: "/matieres" },
+  { id: "apropos",   label: "A propos",  path: "/apropos" },
 ];
 
-export function Menu({ activeItem, onChange }) {
+export function Menu() {
+  const location = useLocation();
+
   return (
     <nav>
       <ul>
-        {MENU_ITEMS.map((item) => (
-          <li
-            key={item.id}
-            onClick={() => onChange(item.id)}
-            className={activeItem === item.id ? "active" : ""}
-          >
-            {item.label}
-          </li>
-        ))}
+        {MENU_ITEMS.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <li
+              key={item.id}
+              className={isActive ? "active" : ""}
+            >
+              <Link to={item.path}>{item.label}</Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -120,7 +126,7 @@ export function Menu({ activeItem, onChange }) {
 export function FooterCredit() {
   const annee = new Date().getFullYear();
 
-  return <p>Todos droits réservés - {annee} CHARLES Mackey</p>;
+  return <p>Tous droits réservés - {annee} CHARLES Mackey</p>;
 }
 
 export function RandomStudent() {
@@ -653,18 +659,17 @@ export function Header() {
 }
 
 export function MainContent() {
-  const [activeItem, setActiveItem] = useState("notes");
-
   return (
     <main>
-      <Menu activeItem={activeItem} onChange={setActiveItem} />
-      {/* Animation fade-in sur changement de menu */}
-      <div key={activeItem} className="fade">
-        <Content activeItem={activeItem} />
+      <Menu />
+      {/* Animation fade-in sur changement de route */}
+      <div className="fade">
+        <Content />
       </div>
     </main>
   );
 }
+
 
 export function Footer() {
   return <FooterCredit />;
@@ -723,22 +728,24 @@ export function Horloge() {
   );
 }
 
-export function Content({ activeItem }) {
-  if (activeItem === "notes") {
-    return <GradeTable />;
-  }
-
-  if (activeItem === "etudiants") {
-    return <StudentTable />;
-  }
-
-  if (activeItem === "matieres") {
-    return <CourseTable />;
-  }
-
-  if (activeItem === "apropos") {
-    return <p>Ce projet est réalisé par Mackey CHARLES</p>;
-  }
-
-  return <p>Veuillez choisir une section dans le menu.</p>;
+export function Content() {
+  return (
+    <Routes>
+      {/* route par défaut : / -> Notes */}
+      <Route path="/" element={<GradeTable />} />
+      {/* Routes explicites du menu */}
+      <Route path="/notes" element={<GradeTable />} />
+      <Route path="/etudiants" element={<StudentTable />} />
+      <Route path="/matieres" element={<CourseTable />} />
+      <Route
+        path="/apropos"
+        element={<p>Ce projet est réalisé par Mackey CHARLES</p>}
+      />
+      {/* fallback */}
+      <Route
+        path="*"
+        element={<p>Veuillez choisir une section dans le menu.</p>}
+      />
+    </Routes>
+  );
 }
