@@ -1,5 +1,5 @@
 import './App.css'
-import {Header,MainContent,Footer, Menu} from './Session02Components/Components'
+import {Header,MainContent,Footer, Menu} from './SessionApiComponents/Components'
 
 function App() {
   return (
